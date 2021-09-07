@@ -12,9 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
-import com.dhruvlimbachiya.pokedexappcompose.others.Constants.KEY_DOMINANT_COLOR
-import com.dhruvlimbachiya.pokedexappcompose.others.Constants.KEY_POKEMON_NAME
-import com.dhruvlimbachiya.pokedexappcompose.others.Screen
+import com.dhruvlimbachiya.pokedexappcompose.util.Constants.KEY_DOMINANT_COLOR
+import com.dhruvlimbachiya.pokedexappcompose.util.Constants.KEY_POKEMON_NAME
+import com.dhruvlimbachiya.pokedexappcompose.util.Screen
 import com.dhruvlimbachiya.pokedexappcompose.ui.theme.JetpackComposePokedexTheme
 import dagger.hilt.android.AndroidEntryPoint
 

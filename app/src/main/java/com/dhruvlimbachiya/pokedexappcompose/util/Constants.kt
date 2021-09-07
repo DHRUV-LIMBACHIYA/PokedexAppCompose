@@ -1,4 +1,4 @@
-package com.dhruvlimbachiya.pokedexappcompose.others
+package com.dhruvlimbachiya.pokedexappcompose.util
 
 /**
  * Created by Dhruv Limbachiya on 07-09-2021.

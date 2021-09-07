@@ -1,7 +1,7 @@
-package com.dhruvlimbachiya.pokedexappcompose.others
+package com.dhruvlimbachiya.pokedexappcompose.util
 
-import com.dhruvlimbachiya.pokedexappcompose.others.Constants.POKEMON_DETAIL_SCREEN_ROUTE
-import com.dhruvlimbachiya.pokedexappcompose.others.Constants.POKEMON_LIST_SCREEN_ROUTE
+import com.dhruvlimbachiya.pokedexappcompose.util.Constants.POKEMON_DETAIL_SCREEN_ROUTE
+import com.dhruvlimbachiya.pokedexappcompose.util.Constants.POKEMON_LIST_SCREEN_ROUTE
 
 /**
  * Created by Dhruv Limbachiya on 07-09-2021.
