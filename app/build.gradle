@@ -14,7 +14,7 @@ android {
         targetSdk 30
         versionCode 1
         versionName "1.0"
-        buildConfigField("String","POKEMON_API",BASE_URL)
+        buildConfigField("String","POKEMON_API_BASE_URL",BASE_URL)
 
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
