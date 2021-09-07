@@ -16,7 +16,10 @@ import com.dhruvlimbachiya.pokedexappcompose.others.Constants.KEY_DOMINANT_COLOR
 import com.dhruvlimbachiya.pokedexappcompose.others.Constants.KEY_POKEMON_NAME
 import com.dhruvlimbachiya.pokedexappcompose.others.Screen
 import com.dhruvlimbachiya.pokedexappcompose.ui.theme.JetpackComposePokedexTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
