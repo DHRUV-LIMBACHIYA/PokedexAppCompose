@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import com.dhruvlimbachiya.pokedexappcompose.ui.pokemon_list_screen.PokemonListScreen
 import com.dhruvlimbachiya.pokedexappcompose.util.Constants.KEY_DOMINANT_COLOR
 import com.dhruvlimbachiya.pokedexappcompose.util.Constants.KEY_POKEMON_NAME
 import com.dhruvlimbachiya.pokedexappcompose.util.Screen
@@ -41,7 +42,7 @@ fun Navigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.PokemonListScreen.route) {
         // Composable for PokemonListScreen
         composable(route = Screen.PokemonListScreen.route) {
-
+            PokemonListScreen(navHostController = navController)
         }
 
         // Composable for PokemonDetailScreen.
