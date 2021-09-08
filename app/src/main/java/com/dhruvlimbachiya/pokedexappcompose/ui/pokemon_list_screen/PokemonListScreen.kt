@@ -44,10 +44,10 @@ import com.dhruvlimbachiya.pokedexappcompose.util.Screen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PokemonListScreen(navHostController: NavHostController) {
+fun PokemonListScreen(navHostController: NavHostController,viewModel: PokedexViewModel = hiltViewModel()) {
     Surface(
         color = MaterialTheme.colors.background,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -66,7 +66,7 @@ fun PokemonListScreen(navHostController: NavHostController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-
+                viewModel.searchPokemon(it)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,6 +134,7 @@ fun PokemonList(
     val isLoading by remember { viewModel.isLoading }
     val loadError by remember { viewModel.loadError }
     val endReached by remember { viewModel.endReached }
+    val isSearching by remember { viewModel.isSearching }
 
     // Create a grid list
     LazyVerticalGrid(
@@ -142,7 +143,7 @@ fun PokemonList(
     ) {
         items(pokemonList.size) {
             // Paginate if it at last element of the list but end of the list is not arrived yet.
-            if (!endReached && it >= pokemonList.size - 1 && !isLoading) {
+            if (!endReached && it >= pokemonList.size - 1 && !isLoading && !isSearching) {
                 viewModel.loadPokemonPaginatedList()
             }
             PokedexEntry(pokedexListEntry = pokemonList[it], navHostController = navHostController)
@@ -267,17 +268,21 @@ fun PokedexEntry(
     }
 }
 
+
+/**
+ * Retry section for displaying any error occurred during loading pokemon list.
+ */
 @Composable
 fun RetrySection(
-    modifier: Modifier = Modifier,
     error: String,
     onRetry: () -> Unit
 ) {
     Column {
         Text(
             text = error,
-            fontSize = 40.sp,
-            color = Color.Black
+            fontSize = 24.sp,
+            color = Color.Black,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(10.dp))
         Button(
