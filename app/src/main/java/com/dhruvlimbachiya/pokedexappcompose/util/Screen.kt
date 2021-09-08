@@ -17,7 +17,7 @@ sealed class Screen(val route: String) {
     /**
      * Helper function for building a route with arguments.
      */
-    fun withArgs(vararg args: String) = buildString {
+    fun withArgs(vararg args: Any) = buildString {
         append(POKEMON_DETAIL_SCREEN_ROUTE) // Route - main url
         args.forEach { arg ->
             append("/$arg") // append arguments on route.

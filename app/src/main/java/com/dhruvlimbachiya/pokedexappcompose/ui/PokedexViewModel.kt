@@ -26,7 +26,7 @@ class PokedexViewModel @Inject constructor(
     private val pokemonRepository: PokemonRepository
 ) : ViewModel() {
 
-    val pokemonList = mutableStateOf<List<PokedexListEntry>>(listOf())
+    var pokemonList = mutableStateOf<List<PokedexListEntry>>(listOf())
     private var currentPage = 0
     var isLoading = mutableStateOf(false)
     var loadError = mutableStateOf("")
@@ -62,6 +62,7 @@ class PokedexViewModel @Inject constructor(
                             entry.url.takeLastWhile { it.isDigit() }
                         }
 
+                        // an image url for a particular pokemon.
                         val imageUrl =
                             "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${number}.png"
 

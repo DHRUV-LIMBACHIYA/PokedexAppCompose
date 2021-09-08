@@ -1,42 +1,35 @@
 package com.dhruvlimbachiya.pokedexappcompose.ui.pokemon_list_screen
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.Coil
 import coil.annotation.ExperimentalCoilApi
 import coil.bitmap.BitmapPool
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
-import coil.request.ImageRequest
 import coil.size.Size
 import coil.transform.Transformation
 import com.dhruvlimbachiya.pokedexappcompose.R
@@ -77,6 +70,8 @@ fun PokemonListScreen(navHostController: NavHostController) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            PokemonList(navHostController = navHostController)
 
         }
     }
@@ -127,6 +122,51 @@ fun Searchbar(
 
 
 /**
+ * Display list of pokemon
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PokemonList(
+    navHostController: NavHostController,
+    viewModel: PokedexViewModel = hiltViewModel()
+) {
+    val pokemonList by remember { viewModel.pokemonList }
+    val isLoading by remember { viewModel.isLoading }
+    val loadError by remember { viewModel.loadError }
+    val endReached by remember { viewModel.endReached }
+
+    // Create a grid list
+    LazyVerticalGrid(
+        cells = GridCells.Fixed(2),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
+    ) {
+        items(pokemonList.size) {
+            // Paginate if it at last element of the list but end of the list is not arrived yet.
+            if (!endReached && it >= pokemonList.size - 1) {
+                viewModel.loadPokemonPaginatedList()
+            }
+            PokedexEntry(pokedexListEntry = pokemonList[it], navHostController = navHostController)
+        }
+    }
+
+    // Box for displaying progress bar or Retry section
+    Box(
+        contentAlignment = Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator()
+        }
+        if (loadError.isNotEmpty()) {
+            RetrySection(error = loadError) {
+                viewModel.loadPokemonPaginatedList()
+            }
+        }
+    }
+
+}
+
+/**
  * Individual Pokedex Entry.
  */
 @ExperimentalCoilApi
@@ -148,46 +188,55 @@ fun PokedexEntry(
     Box(
         contentAlignment = Center,
         modifier = modifier
+            .padding(horizontal = 8.dp, vertical = 8.dp)
             .shadow(elevation = 6.dp, shape = RoundedCornerShape(10.dp))
             .clip(RoundedCornerShape(10.dp))
             .aspectRatio(1f)
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        defaultDominantColor,
-                        dominantColor
+                        dominantColor,
+                        defaultDominantColor
                     )
                 )
             )
             .clickable {
-            navHostController.navigate(Screen.PokemonDetailScreen.route + "/${dominantColor.toArgb()}/${pokedexListEntry.name}")
-        }
+                navHostController.navigate(
+                    Screen.PokemonDetailScreen.withArgs(
+                        dominantColor.toArgb(),
+                        pokedexListEntry.name
+                    )
+                )
+            }
     ) {
+
+        // Create and config painter.
+        val painter = rememberImagePainter(
+            data = pokedexListEntry.imageUrl, // Request the data from the image url
+            builder = {
+                crossfade(true) // Enable cross-fade animation when images are successfully loaded.
+                transformations(object : Transformation {
+                    override fun key(): String {
+                        return pokedexListEntry.imageUrl ?: ""
+                    }
+
+                    override suspend fun transform(
+                        pool: BitmapPool,
+                        input: Bitmap,
+                        size: Size
+                    ): Bitmap {
+                        viewModel.getDominantColorFromDrawable(input) { color ->
+                            dominantColor = color // Update the dominant color.
+                        }
+                        return input
+                    }
+
+                })
+            }
+        )
+
         Column {
-            val painter = rememberImagePainter(
-                data = pokedexListEntry.imageUrl, // Request the data from the image url
-                builder = {
-                    crossfade(true) // Enable cross-fade animation when images are successfully loaded.
-                    placeholder(R.drawable.pokeball)
-                    transformations(object : Transformation {
-                        override fun key(): String {
-                            return pokedexListEntry.imageUrl ?: ""
-                        }
-
-                        override suspend fun transform(
-                            pool: BitmapPool,
-                            input: Bitmap,
-                            size: Size
-                        ): Bitmap {
-                            viewModel.getDominantColorFromDrawable(input) { color ->
-                                dominantColor = color // Update the dominant color.
-                            }
-                            return input
-                        }
-
-                    })
-                }
-            )
+            // Pokemon image.
             Image(
                 painter = painter,
                 contentDescription = pokedexListEntry.name,
@@ -195,17 +244,6 @@ fun PokedexEntry(
                     .size(120.dp)
                     .align(CenterHorizontally)
             )
-
-            when (painter.state) {
-                // Display progress bar on image loading.
-                is ImagePainter.State.Loading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.scale(0.5f)
-                    )
-                }
-                else -> {/*NO OP*/
-                }
-            }
 
             // Display Pokemon name
             Text(
@@ -215,6 +253,40 @@ fun PokedexEntry(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+
+        when (painter.state) {
+            // Display progress bar on image loading.
+            is ImagePainter.State.Loading -> {
+                CircularProgressIndicator()
+            }
+            else -> {/*NO OP*/
+            }
+        }
+
+    }
+}
+
+@Composable
+fun RetrySection(
+    modifier: Modifier = Modifier,
+    error: String,
+    onRetry: () -> Unit
+) {
+    Column {
+        Text(
+            text = error,
+            fontSize = 40.sp,
+            color = Color.Black
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Button(
+            onClick = {
+                onRetry()
+            },
+            modifier = Modifier.align(CenterHorizontally)
+        ) {
+            Text(text = "Retry")
         }
     }
 }
