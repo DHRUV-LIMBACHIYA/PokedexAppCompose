@@ -20,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dhruvlimbachiya.pokedexappcompose.R
+import com.google.accompanist.coil.CoilImage
 
 /**
  * Created by Dhruv Limbachiya on 07-09-2021.
@@ -45,8 +46,8 @@ fun PokemonListScreen(navHostController: NavHostController) {
 
             Searchbar(
                  modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                     .fillMaxWidth()
+                     .padding(horizontal = 16.dp)
             ) {
 
             }
@@ -91,7 +92,7 @@ fun Searchbar(
                 .fillMaxWidth()
                 .shadow(6.dp, CircleShape)
                 .background(color = Color.White, CircleShape)
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 6.dp),
             shape = CircleShape
         )
     }
