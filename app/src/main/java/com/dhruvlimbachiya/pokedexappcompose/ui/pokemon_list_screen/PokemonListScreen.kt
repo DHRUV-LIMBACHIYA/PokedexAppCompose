@@ -142,7 +142,7 @@ fun PokemonList(
     ) {
         items(pokemonList.size) {
             // Paginate if it at last element of the list but end of the list is not arrived yet.
-            if (!endReached && it >= pokemonList.size - 1) {
+            if (!endReached && it >= pokemonList.size - 1 && !isLoading) {
                 viewModel.loadPokemonPaginatedList()
             }
             PokedexEntry(pokedexListEntry = pokemonList[it], navHostController = navHostController)
