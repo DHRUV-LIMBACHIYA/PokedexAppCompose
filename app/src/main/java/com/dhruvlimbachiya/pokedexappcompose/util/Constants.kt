@@ -9,4 +9,5 @@ object Constants {
     const val POKEMON_DETAIL_SCREEN_ROUTE = "pokemon_detail_screen"
     const val KEY_DOMINANT_COLOR = "dominantColor"
     const val KEY_POKEMON_NAME = "pokemonName"
+    const val PAGE_SIZE = 20
 }

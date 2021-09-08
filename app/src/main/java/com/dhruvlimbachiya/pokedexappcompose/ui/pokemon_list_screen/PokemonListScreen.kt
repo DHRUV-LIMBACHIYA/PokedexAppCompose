@@ -125,6 +125,10 @@ fun Searchbar(
     }
 }
 
+
+/**
+ * Individual Pokedex Entry.
+ */
 @ExperimentalCoilApi
 @Composable
 fun PokedexEntry(
