@@ -1,4 +1,4 @@
-package com.dhruvlimbachiya.pokedexappcompose.ui.pokemon_list_screen
+package com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokemonlist
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -34,7 +34,6 @@ import coil.size.Size
 import coil.transform.Transformation
 import com.dhruvlimbachiya.pokedexappcompose.R
 import com.dhruvlimbachiya.pokedexappcompose.model.PokedexListEntry
-import com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokemonlist.PokemonListViewModel
 import com.dhruvlimbachiya.pokedexappcompose.ui.theme.RobotoCondensed
 import com.dhruvlimbachiya.pokedexappcompose.util.Screen
 

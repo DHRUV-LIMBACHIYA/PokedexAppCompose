@@ -3,6 +3,7 @@ package com.dhruvlimbachiya.pokedexappcompose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -12,12 +13,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
-import com.dhruvlimbachiya.pokedexappcompose.ui.pokemon_list_screen.PokemonListScreen
+import com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokemonlist.PokemonListScreen
+import com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokeomdetail.PokemonDetailScreen
 import com.dhruvlimbachiya.pokedexappcompose.util.Constants.KEY_DOMINANT_COLOR
 import com.dhruvlimbachiya.pokedexappcompose.util.Constants.KEY_POKEMON_NAME
 import com.dhruvlimbachiya.pokedexappcompose.util.Screen
 import com.dhruvlimbachiya.pokedexappcompose.ui.theme.JetpackComposePokedexTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -48,7 +51,7 @@ fun Navigation(navController: NavHostController) {
         // Composable for PokemonDetailScreen.
         composable(
             // Route for navigating and passing argument to PokemonDetailScreen.
-            route = Screen.PokemonDetailScreen.route + "/dominantColor/pokemonName",
+            route = Screen.PokemonDetailScreen.route + "/{dominantColor}/{pokemonName}",
             // list of arguments.
             arguments = listOf(
                 navArgument(KEY_DOMINANT_COLOR) {
@@ -68,6 +71,12 @@ fun Navigation(navController: NavHostController) {
             val pokemonName = remember {
                 it.arguments?.getString(KEY_POKEMON_NAME) // Get the pokemon name from the arguments
             }
+
+            PokemonDetailScreen(
+                navHostController = navController,
+                dominantColor = dominantColor ?: MaterialTheme.colors.surface,
+                pokemonName = pokemonName?.lowercase(Locale.ROOT) ?: "",
+            )
         }
     }
 }

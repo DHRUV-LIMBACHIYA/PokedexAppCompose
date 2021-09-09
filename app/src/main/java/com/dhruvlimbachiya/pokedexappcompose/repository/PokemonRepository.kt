@@ -5,6 +5,7 @@ import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.Pokemon
 import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.PokemonList
 import com.dhruvlimbachiya.pokedexappcompose.util.Resource
 import dagger.hilt.android.scopes.ActivityScoped
+import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -37,6 +38,7 @@ class PokemonRepository @Inject constructor(
             val response = pokeApi.getPokemon(name)
             Resource.Success(response)
         }catch (e: Exception) {
+            Timber.e(e)
             Resource.Error("Failed to fetch Pokemon record!")
         }
     }
