@@ -1,5 +1,7 @@
 package com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokeomdetail
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,12 +13,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -25,6 +27,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,6 +39,8 @@ import com.dhruvlimbachiya.pokedexappcompose.R
 import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.Pokemon
 import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.Type
 import com.dhruvlimbachiya.pokedexappcompose.util.Resource
+import com.dhruvlimbachiya.pokedexappcompose.util.parseStatToAbbr
+import com.dhruvlimbachiya.pokedexappcompose.util.parseStatToColor
 import com.dhruvlimbachiya.pokedexappcompose.util.parseTypeToColor
 import java.util.*
 
@@ -232,6 +237,8 @@ fun PokemonDetails(
         PokemonTypeSection(types = pokemon.types, modifier = Modifier.fillMaxWidth())
 
         PokemonWeightAndHeightSection(pokemon = pokemon)
+
+        PokemonStatSection(pokemon)
     }
 }
 
@@ -245,7 +252,7 @@ fun PokemonTypeSection(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(16.dp)
+        modifier = modifier.padding(top = 20.dp,start = 16.dp,end = 16.dp,bottom = 16.dp)
     ) {
         for (type in types) {
             Box(
@@ -322,6 +329,114 @@ fun PokemonWeightAndHeightSection(
     }
 }
 
+@Composable
+fun PokemonStatSection(
+    pokemon: Pokemon
+) {
+
+    val maxStat = remember {
+        pokemon.stats.maxOf { it.base_stat } // Returns the largest value among all values
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = "Basic Stats:",
+            fontSize = 18.sp,
+            color = MaterialTheme.colors.onSurface
+        )
+    }
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    for (i in pokemon.stats.indices) {
+        PokeStatisticsData(
+            statName = parseStatToAbbr(pokemon.stats[i]), // Parse the stat full name to abbrievate form
+            statValue = pokemon.stats[i].base_stat, // base stat value of pokemon
+            statMaxValue = maxStat, // Max stat value among all pokemon
+            statColor = parseStatToColor(pokemon.stats[i]), // Parse pokemon stat into color
+            animationDelay = i * 100 // delay per stat item.
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+fun PokeStatisticsData(
+    statName: String,
+    statValue: Int,
+    statMaxValue: Int,
+    statColor: Color,
+    animationDelay: Int,
+    animationDuration: Int = 1000,
+    sectionHeight: Dp = 28.dp
+) {
+
+    // Is animation played or not.
+    var isAnimated by remember {
+        mutableStateOf(false)
+    }
+
+    val currentWidthPercent = animateFloatAsState(
+        // if animation played the interpolate from 0f to statValue else stateValue => 0
+        targetValue = if (isAnimated) {
+            statValue / statMaxValue.toFloat()
+        } else {
+            0f
+        },
+        animationSpec = tween(
+            durationMillis = animationDuration, // animation duration time
+            delayMillis = animationDelay // animation delay time
+        )
+    )
+
+
+    LaunchedEffect(key1 = true) {
+        isAnimated = true // enable is animated once
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = if (isSystemInDarkTheme()) {
+                    Color(0xFF505050)
+                } else {
+                    Color.LightGray
+                },
+                shape = CircleShape
+            )
+            .clip(CircleShape)
+            .height(sectionHeight)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(currentWidthPercent.value)
+                .clip(CircleShape)
+                .background(statColor, CircleShape)
+                .padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = statName,
+                color = MaterialTheme.colors.onSurface,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                // currentWidthPercent is in between 0f to 1f so to make it two digit number multiply with statMaxValue.
+                // Ex: currentWidthPercent = 0.5 & statMaxValue = 100  => 0.5 * 100 = 50(Ans)
+                text = (currentWidthPercent.value * statMaxValue).toInt().toString(),
+                color = MaterialTheme.colors.onSurface,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
 
 /**
  * A reusable composable for display height and weight with icon.
@@ -354,3 +469,4 @@ fun PokemonDataItem(
     }
 
 }
+
