@@ -1,9 +1,8 @@
 package com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokeomdetail
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -13,20 +12,32 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.dhruvlimbachiya.pokedexappcompose.R
 import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.Pokemon
+import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.Type
 import com.dhruvlimbachiya.pokedexappcompose.util.Resource
+import com.dhruvlimbachiya.pokedexappcompose.util.parseTypeToColor
+import java.util.*
 
 /**
  * Created by Dhruv Limbachiya on 09-09-2021.
@@ -74,11 +85,12 @@ fun PokemonDetailScreen(
             progressbarModifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    top = topPadding + pokemonImageSize / 2,
+                    top = topPadding + pokemonImageSize / 2f,
                     start = 16.dp,
                     end = 16.dp,
                     bottom = 16.dp
-                ),
+                )
+                .align(Center),
             pokemon = pokemon
         )
 
@@ -173,11 +185,18 @@ fun PokemonInfoSection(
         is Resource.Loading -> {
             CircularProgressIndicator(
                 modifier = progressbarModifier
-                    .size(100.dp)
+                    .scale(0.5f)
             )
         }
         is Resource.Success -> {
-
+            pokemon.data?.let { data ->
+                PokemonDetails(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .offset(y = 70.dp),
+                    pokemon = data
+                )
+            }
         }
         is Resource.Error -> {
             Text(
@@ -187,6 +206,151 @@ fun PokemonInfoSection(
                 textAlign = TextAlign.Center
             )
         }
+    }
+
+}
+
+/**
+ * Composable for displaying Pokemon details like its name,type,weight,height & stats.
+ */
+@Composable
+fun PokemonDetails(
+    modifier: Modifier = Modifier,
+    pokemon: Pokemon,
+) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = modifier.verticalScroll(scrollState),
+        horizontalAlignment = CenterHorizontally,
+    ) {
+        Text(
+            text = "#${pokemon.id} ${pokemon.name.replaceFirstChar { it.uppercase(Locale.ROOT) }}", // Ex :  #42 Goblat
+            fontSize = 30.sp,
+            color = MaterialTheme.colors.onSurface,
+        )
+
+        PokemonTypeSection(types = pokemon.types, modifier = Modifier.fillMaxWidth())
+
+        PokemonWeightAndHeightSection(pokemon = pokemon)
+    }
+}
+
+/**
+ * Display pokemon type in circle shape box.
+ */
+@Composable
+fun PokemonTypeSection(
+    modifier: Modifier = Modifier,
+    types: List<Type>
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(16.dp)
+    ) {
+        for (type in types) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .weight(1f)
+                    .background(
+                        parseTypeToColor(type),
+                        CircleShape
+                    ) // Choose bgColor based on type of pokemon.
+                    .clip(CircleShape)
+                    .height(35.dp),
+                contentAlignment = Center
+            ) {
+                Text(
+                    text = type.type.name.replaceFirstChar { it.uppercase(Locale.ROOT) }, // Make first letter capital.
+                    color = Color.White,
+                    fontSize = 18.sp,
+                )
+            }
+        }
+    }
+}
+
+
+/**
+ * Display height and weight of Pokemon
+ */
+@Composable
+fun PokemonWeightAndHeightSection(
+    pokemon: Pokemon,
+    sectionHeight: Dp = 80.dp
+) {
+
+    // Convert weight and height in float with one decimal digit.
+    val weightInKg = remember {
+        pokemon.weight / 10f
+    }
+
+    val heightInMeter = remember {
+        pokemon.height / 10f
+    }
+
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+
+        // Display weight data.
+        PokemonDataItem(
+            dataValue = weightInKg,
+            dataUnit = "kg",
+            image = painterResource(id = R.drawable.ic_weight),
+            modifier = Modifier
+                .height(sectionHeight)
+                .weight(1f)
+        )
+
+        Spacer(
+            modifier = Modifier
+                .size(1.dp, sectionHeight)
+                .background(Color.LightGray)
+        )
+
+        // Display height data.
+        PokemonDataItem(
+            dataValue = heightInMeter,
+            dataUnit = "m",
+            image = painterResource(id = R.drawable.ic_height),
+            modifier = Modifier
+                .height(sectionHeight)
+                .weight(1f)
+        )
+    }
+}
+
+
+/**
+ * A reusable composable for display height and weight with icon.
+ */
+@Composable
+fun PokemonDataItem(
+    modifier: Modifier = Modifier,
+    dataValue: Float,
+    dataUnit: String,
+    image: Painter
+) {
+    Column(
+        horizontalAlignment = CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        Icon(
+            painter = image,
+            contentDescription = "unit",
+            tint = MaterialTheme.colors.onSurface
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = "$dataValue$dataUnit",
+            color = MaterialTheme.colors.onSurface,
+            fontSize = 16.sp
+        )
     }
 
 }
