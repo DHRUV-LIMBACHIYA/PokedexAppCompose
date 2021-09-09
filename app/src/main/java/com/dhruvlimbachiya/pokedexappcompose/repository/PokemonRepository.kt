@@ -37,7 +37,7 @@ class PokemonRepository @Inject constructor(
             val response = pokeApi.getPokemon(name)
             Resource.Success(response)
         }catch (e: Exception) {
-            Resource.Error("An Unknown error occured!")
+            Resource.Error("Failed to fetch Pokemon record!")
         }
     }
 }
