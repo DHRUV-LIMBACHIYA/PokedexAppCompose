@@ -1,4 +1,4 @@
-package com.dhruvlimbachiya.pokedexappcompose.ui
+package com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokemonlist
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +21,7 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class PokedexViewModel @Inject constructor(
+class PokemonListViewModel @Inject constructor(
     private val pokemonRepository: PokemonRepository
 ) : ViewModel() {
 

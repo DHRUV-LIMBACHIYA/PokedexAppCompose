@@ -34,7 +34,7 @@ import coil.size.Size
 import coil.transform.Transformation
 import com.dhruvlimbachiya.pokedexappcompose.R
 import com.dhruvlimbachiya.pokedexappcompose.model.PokedexListEntry
-import com.dhruvlimbachiya.pokedexappcompose.ui.PokedexViewModel
+import com.dhruvlimbachiya.pokedexappcompose.ui.screens.pokemonlist.PokemonListViewModel
 import com.dhruvlimbachiya.pokedexappcompose.ui.theme.RobotoCondensed
 import com.dhruvlimbachiya.pokedexappcompose.util.Screen
 
@@ -44,7 +44,7 @@ import com.dhruvlimbachiya.pokedexappcompose.util.Screen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PokemonListScreen(navHostController: NavHostController,viewModel: PokedexViewModel = hiltViewModel()) {
+fun PokemonListScreen(navHostController: NavHostController,viewModel: PokemonListViewModel = hiltViewModel()) {
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize(),
@@ -128,7 +128,7 @@ fun Searchbar(
 @Composable
 fun PokemonList(
     navHostController: NavHostController,
-    viewModel: PokedexViewModel = hiltViewModel()
+    viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     val pokemonList by remember { viewModel.pokemonList }
     val isLoading by remember { viewModel.isLoading }
@@ -175,7 +175,7 @@ fun PokemonList(
 fun PokedexEntry(
     modifier: Modifier = Modifier,
     pokedexListEntry: PokedexListEntry,
-    viewModel: PokedexViewModel = hiltViewModel(),
+    viewModel: PokemonListViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
 
