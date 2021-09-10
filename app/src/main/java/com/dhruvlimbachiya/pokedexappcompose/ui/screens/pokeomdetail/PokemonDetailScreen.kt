@@ -12,9 +12,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -38,10 +35,7 @@ import coil.compose.rememberImagePainter
 import com.dhruvlimbachiya.pokedexappcompose.R
 import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.Pokemon
 import com.dhruvlimbachiya.pokedexappcompose.data.remote.responses.Type
-import com.dhruvlimbachiya.pokedexappcompose.util.Resource
-import com.dhruvlimbachiya.pokedexappcompose.util.parseStatToAbbr
-import com.dhruvlimbachiya.pokedexappcompose.util.parseStatToColor
-import com.dhruvlimbachiya.pokedexappcompose.util.parseTypeToColor
+import com.dhruvlimbachiya.pokedexappcompose.util.*
 import java.util.*
 
 /**
@@ -252,7 +246,7 @@ fun PokemonTypeSection(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(top = 20.dp,start = 16.dp,end = 16.dp,bottom = 16.dp)
+        modifier = modifier.padding(top = 20.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
         for (type in types) {
             Box(
@@ -352,15 +346,18 @@ fun PokemonStatSection(
 
     for (i in pokemon.stats.indices) {
         PokeStatisticsData(
-            statName = parseStatToAbbr(pokemon.stats[i]), // Parse the stat full name to abbrievate form
-            statValue = pokemon.stats[i].base_stat, // base stat value of pokemon
-            statMaxValue = maxStat, // Max stat value among all pokemon
+            statName = parseStatToAbbr(pokemon.stats[i]), // Parse the stat full name to abbreviate form
+            statValue = pokemon.stats[i].base_stat , // base stat value of pokemon
+            statMaxValue = findMaxStatValue(pokemon.stats[i].base_stat), // Max stat value among all pokemon
             statColor = parseStatToColor(pokemon.stats[i]), // Parse pokemon stat into color
             animationDelay = i * 100 // delay per stat item.
         )
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
+
+
+
 
 @Composable
 fun PokeStatisticsData(
@@ -429,7 +426,11 @@ fun PokeStatisticsData(
             Text(
                 // currentWidthPercent is in between 0f to 1f so to make it two digit number multiply with statMaxValue.
                 // Ex: currentWidthPercent = 0.5 & statMaxValue = 100  => 0.5 * 100 = 50(Ans)
-                text = (currentWidthPercent.value * statMaxValue).toInt().toString(),
+                text = if ((currentWidthPercent.value * statMaxValue).toInt() > 100) {
+                    "100+"
+                } else {
+                    (currentWidthPercent.value * statMaxValue).toInt().toString()
+                },
                 color = MaterialTheme.colors.onSurface,
                 fontWeight = FontWeight.Bold
             )

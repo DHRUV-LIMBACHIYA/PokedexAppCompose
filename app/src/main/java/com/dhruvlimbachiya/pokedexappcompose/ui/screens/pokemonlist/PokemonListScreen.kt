@@ -30,6 +30,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.bitmap.BitmapPool
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import coil.size.Size
 import coil.transform.Transformation
 import com.dhruvlimbachiya.pokedexappcompose.R
@@ -123,6 +124,7 @@ fun Searchbar(
 /**
  * Display list of pokemon
  */
+@ExperimentalCoilApi
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PokemonList(
@@ -138,14 +140,19 @@ fun PokemonList(
     // Create a grid list
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
     ) {
         items(pokemonList.size) {
             // Paginate if it at last element of the list but end of the list is not arrived yet.
             if (!endReached && it >= pokemonList.size - 1 && !isLoading && !isSearching) {
                 viewModel.loadPokemonPaginatedList()
             }
-            PokedexEntry(pokedexListEntry = pokemonList[it], navHostController = navHostController)
+            key(pokemonList[it].serialNumber) {
+                PokedexEntry(
+                    pokedexListEntry = pokemonList[it],
+                    navHostController = navHostController
+                )
+            }
         }
     }
 
@@ -232,7 +239,7 @@ fun PokedexEntry(
                     }
 
                 })
-            }
+            },
         )
 
         Column {

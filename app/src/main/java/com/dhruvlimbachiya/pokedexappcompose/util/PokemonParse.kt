@@ -10,6 +10,8 @@ import java.util.*
  * Created by Dhruv Limbachiya on 09-09-2021.
  */
 
+const val DEFAULT_MAX_VALUE = 100
+
 fun parseTypeToColor(type: Type): Color {
     return when(type.type.name.toLowerCase(Locale.ROOT)) {
         "normal" -> TypeNormal
@@ -55,5 +57,13 @@ fun parseStatToAbbr(stat: Stat): String {
         "special-defense" -> "SpDef"
         "speed" -> "Spd"
         else -> ""
+    }
+}
+
+fun findMaxStatValue(statValue: Int) : Int {
+    return if(statValue <= DEFAULT_MAX_VALUE){
+        DEFAULT_MAX_VALUE
+    } else {
+        statValue
     }
 }
