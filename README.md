@@ -1,4 +1,4 @@
-# PokedexAppCompose
+# Pokedex App in Jetpack Compose
 
 Libraries used :
 * [Retrofit](https://square.github.io/retrofit/)
